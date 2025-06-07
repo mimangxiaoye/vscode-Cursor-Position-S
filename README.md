@@ -1,33 +1,9 @@
-中文：
-我一直想找一个关闭整个vscode可以自动回到上次光标位置的插件，不知道是我搜索还是英文名或者是根本就没有这个插件。我没找到，所以就用ai写了这个插件 住：使用gpt ai翻译不确保对不对。
-这个插件是我用claude，ai编写出来的代码，作用是防止你为了躲避某人或者不小心点出了vscode导致源文件的光标位置忘记或者不想再从文章最上面重新找到上次光标位置。所以就做了这个插件，在设置里面搜索Cursor Position Saver这个会找到扩展的设置当然是中文的，因为本人一点编程也不会，英语也不会，用ai翻译的。哈哈哈。学习还要很长的时间，如果有大佬来帮我一起完成这个项目最好了。一直开源。因为我本来就是想着方便大家。
-解释1下，扩展设置的详细信息，我也不知道claude搞得行不行：从搜索Cursor Position Saver按上到下排序
-1.是否启用关闭整个vscode光标保存
-2.保存在本地计算机的文件数量（按照最新保存时间）
-3.保存光标的时间（顾名思义，就是保存的时间。我也不知道gpt能不能翻译中文成语）
-4.保存的位置 1.c盘用户文件你的用户名mycode 比如：C:\Users\你的用户名\mycode\cursor-positions.json 2.d盘 mycode
-5.提示保存光标的时间（右下角会提示这个文件光标保存的信息，）
-----------------------------------------就这5个设置剩下的不是-----------------------------------------------
-english：GPT-based AI Translation
-I’ve always wanted a plugin that could restore the last cursor position after completely closing VS Code. I tried searching for it, but maybe I didn’t use the right English keywords—or maybe such a plugin simply didn’t exist. So I used AI to help me write this one.
+English：【ranslate using GPT】
+目前最新版为1.0版本，没什么特殊情况不会更新了。
+中文：需要自己探索。vscode导入下载后的插件。修改插件设置只需要在设置扩展里面搜索：cursor position saver就可以了 6个选项可用。那一个我也懒得改了，目前没有英文想法，因为本人不会翻译。就这样。我们有缘再见。
 
-This plugin was created using Claude AI. Its purpose is to help you remember your last editing position, especially if you accidentally close VS Code, switch windows to avoid someone, or just don’t want to scroll back from the top every time.
-
-You can find the plugin settings by searching “Cursor Position Saver” in VS Code’s settings. The setting labels are in Chinese, because I don’t know programming or English well—I used AI for translation, haha . Still learning! If someone more experienced is willing to help improve this project, that would be amazing. It’s open-source and always will be. I just want it to help others like me.
-
-🛠 Plugin Settings Explanation (listed from top to bottom):
-Enable cursor position saving when VS Code closes completely
-
-Number of files to save (based on most recent save time)
-
-Save interval (how often the cursor positions are saved; not sure if GPT can properly translate Chinese idioms hahaha)
-
-Save location
-
-C:\Users\<your-username>\mycode\cursor-positions.json
-
-or D:\mycode
-
-Show cursor save time in notification (a message will pop up in the lower right corner showing that the cursor was saved)
-
-------------That’s all! The rest of the settings aren’t really used for now.---------------
+The current latest version is 1.0. It will not be updated unless something unusual happens.
+Chinese only: You’ll need to explore how to import the downloaded plugin into VS Code by yourself.
+To modify plugin settings, just search for "cursor position saver" in the extension settings. There are six options available.
+I'm too lazy to change anything else. I have no plan for an English version since I don’t know how to translate properly.
+That’s it. See you if fate allows.
