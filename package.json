@@ -1,0 +1,172 @@
+{
+  "name": "cursor-position-saver",
+  "displayName": "光标位置保存器",
+  "description": "自动保存和恢复光标位置，智能提示，持续保护您的编辑进度",
+  "version": "1.0.0",
+  "publisher": "your-publisher-name",
+  "engines": {
+    "vscode": "^1.74.0"
+  },
+  "categories": [
+    "Other"
+  ],
+  "keywords": [
+    "cursor",
+    "position",
+    "save",
+    "restore",
+    "光标",
+    "位置保存"
+  ],
+  "activationEvents": [
+    "onStartupFinished"
+  ],
+  "main": "./out/extension.js",
+  "contributes": {
+    "configuration": {
+      "title": "光标位置保存器",
+      "properties": {
+        "cursorSaver.saveInterval": {
+          "type": "number",
+          "default": 5,
+          "enum": [
+            3,
+            5,
+            20,
+            60
+          ],
+          "enumDescriptions": [
+            "3秒 - 频繁保存",
+            "5秒 - 推荐设置",
+            "20秒 - 适中频率",
+            "1分钟 - 低频保存"
+          ],
+          "description": "自动保存光标位置的时间间隔（秒）"
+        },
+        "cursorSaver.saveLocation": {
+          "type": "string",
+          "default": "c_user",
+          "enum": [
+            "c_user",
+            "d_mycode"
+          ],
+          "enumDescriptions": [
+            "C盘/用户/用户名/mycode - 默认位置",
+            "D盘/mycode - 备用位置"
+          ],
+          "description": "光标位置保存路径"
+        },
+        "cursorSaver.tipMode": {
+          "type": "string",
+          "default": "none",
+          "enum": [
+            "none",
+            "statusbar",
+            "5s",
+            "10s",
+            "1min"
+          ],
+          "enumDescriptions": [
+            "不显示提示 - 静默模式",
+            "仅状态栏显示 - 推荐",
+            "每5秒提示一次 - 频繁提醒",
+            "每10秒提示一次 - 适中提醒",
+            "每分钟提示一次 - 低频提醒"
+          ],
+          "description": "提示显示方式"
+        },
+        "cursorSaver.showStartupMessage": {
+          "type": "boolean",
+          "default": true,
+          "description": "启动时显示欢迎消息"
+        },
+        "cursorSaver.enableStatusBar": {
+          "type": "boolean",
+          "default": true,
+          "description": "在状态栏显示插件状态"
+        },
+        "cursorSaver.enableOutputLog": {
+          "type": "boolean",
+          "default": false,
+          "description": "在输出面板记录详细日志"
+        }
+      }
+    },
+    "commands": [
+      {
+        "command": "cursorSaver.saveNow",
+        "title": "立即保存光标位置",
+        "category": "光标保存器"
+      },
+      {
+        "command": "cursorSaver.restorePosition",
+        "title": "恢复光标位置",
+        "category": "光标保存器"
+      },
+      {
+        "command": "cursorSaver.toggleTips",
+        "title": "切换提示模式",
+        "category": "光标保存器"
+      },
+      {
+        "command": "cursorSaver.showStatus",
+        "title": "显示插件状态",
+        "category": "光标保存器"
+      }
+    ],
+    "menus": {
+      "commandPalette": [
+        {
+          "command": "cursorSaver.saveNow"
+        },
+        {
+          "command": "cursorSaver.restorePosition"
+        },
+        {
+          "command": "cursorSaver.toggleTips"
+        },
+        {
+          "command": "cursorSaver.showStatus"
+        }
+      ]
+    },
+    "keybindings": [
+      {
+        "command": "cursorSaver.saveNow",
+        "key": "ctrl+shift+s",
+        "mac": "cmd+shift+s",
+        "when": "editorTextFocus"
+      },
+      {
+        "command": "cursorSaver.restorePosition",
+        "key": "ctrl+shift+r",
+        "mac": "cmd+shift+r"
+      }
+    ]
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run compile",
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./",
+    "pretest": "npm run compile && npm run lint",
+    "lint": "eslint src --ext ts",
+    "test": "vscode-test"
+  },
+  "devDependencies": {
+    "@types/node": "^18.19.111",
+    "@types/vscode": "^1.74.0",
+    "@types/mocha": "^10.0.6",
+    "@vscode/test-cli": "^0.0.4",
+    "@vscode/test-electron": "^2.3.8",
+    "mocha": "^10.2.0",
+    "typescript": "^4.9.4"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/your-username/cursor-position-saver"
+  },
+  "bugs": {
+    "url": "https://github.com/your-username/cursor-position-saver/issues"
+  },
+  "homepage": "https://github.com/your-username/cursor-position-saver#readme"
+}
