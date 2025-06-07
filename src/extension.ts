@@ -22,6 +22,8 @@ export class CursorPositionManager {
 	private storageFile: string = '';
 	private logger: Logger;
 	private statusBarItem: vscode.StatusBarItem | undefined;
+	restoreAllFiles: any;
+	restoreActiveEditorCursorPosition: any;
 
 	constructor(context: vscode.ExtensionContext) {
 		this.context = context;
@@ -32,7 +34,30 @@ export class CursorPositionManager {
 		this.startTimers();
 		this.setupEventListeners();
 		this.showStartupMessage();
+
+		// 延迟恢复已打开文件的光标位置
+		setTimeout(() => {
+			this.restoreAllOpenFilesOnStartup();
+		}, 500);
+
 		this.logger.info('CursorPositionManager initialized successfully');
+	}
+
+	private restoreAllOpenFilesOnStartup(): void {
+		// 获取所有当前打开的文件编辑器
+		vscode.window.visibleTextEditors.forEach(editor => {
+			if (editor.document.uri.scheme === 'file' && this.isEnabled()) {
+				this.restoreCursorPosition(editor);
+			}
+		});
+
+		// 如果有活动编辑器，也恢复其位置
+		const activeEditor = vscode.window.activeTextEditor;
+		if (activeEditor && activeEditor.document.uri.scheme === 'file' && this.isEnabled()) {
+			this.restoreCursorPosition(activeEditor);
+		}
+
+		this.logger.info('Restored cursor positions for all open files on startup');
 	}
 
 	private initializeStorage(): void {
@@ -76,16 +101,11 @@ export class CursorPositionManager {
 	private showStartupMessage(): void {
 		const config = vscode.workspace.getConfiguration('cursorPositionSaver');
 		if (config.get('showStartupMessage', true)) {
-			// 方式1: 带图标的信息消息
+			// 只显示一次启动消息
 			vscode.window.showInformationMessage('$(check) 光标位置保存插件已启动');
 
-			// 方式2: 状态栏临时消息
-			vscode.window.setStatusBarMessage('$(sync~spin) 光标保存插件启动中...', 3000);
-
-			// 显示启动完成的通知栏消息
-			setTimeout(() => {
-				vscode.window.setStatusBarMessage('$(check-all) 光标保存插件启动完成', 2000);
-			}, 1000);
+			// 使用状态栏消息显示启动进度，不会弹出对话框
+			vscode.window.setStatusBarMessage('$(sync~spin) 光标保存插件启动中...', 2000);
 		}
 	}
 
@@ -228,15 +248,6 @@ export class CursorPositionManager {
 			}
 		}
 	}
-
-	public restoreActiveEditorCursorPosition(): void {
-		const editor = vscode.window.activeTextEditor;
-		if (editor && this.isEnabled()) {
-			this.restoreCursorPosition(editor);
-			vscode.window.showInformationMessage('$(location) 光标位置已恢复');
-		}
-	}
-
 	private startTimers(): void {
 		const config = vscode.workspace.getConfiguration('cursorPositionSaver');
 		const saveInterval = config.get<number>('saveInterval', 10) * 1000;
@@ -470,6 +481,9 @@ export function activate(context: vscode.ExtensionContext) {
 			}),
 			vscode.commands.registerCommand('cursorPositionSaver.restore', () => {
 				cursorPositionManager.restoreActiveEditorCursorPosition();
+			}),
+			vscode.commands.registerCommand('cursorPositionSaver.restoreAll', () => {
+				cursorPositionManager.restoreAllFiles();
 			}),
 			vscode.commands.registerCommand('cursorPositionSaver.toggleTips', () => {
 				cursorPositionManager.toggleTips();
