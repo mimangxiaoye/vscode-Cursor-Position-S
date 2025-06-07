@@ -1,0 +1,159 @@
+{
+  "name": "cursor-position-saver",
+  "displayName": "Cursor Position Saver",
+  "description": "自动保存和恢复光标位置的VSCode插件",
+  "version": "1.0.0",
+  "publisher": "your-publisher-name",
+  "engines": {
+    "vscode": "^1.60.0"
+  },
+  "categories": [
+    "Other"
+  ],
+  "keywords": [
+    "cursor",
+    "position",
+    "save",
+    "restore",
+    "光标位置"
+  ],
+  "activationEvents": [
+    "*"
+  ],
+  "main": "./out/extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "cursorPositionSaver.toggle",
+        "title": "切换光标位置保存功能",
+        "category": "光标保存"
+      },
+      {
+        "command": "cursorPositionSaver.saveNow",
+        "title": "立即保存光标位置",
+        "category": "光标保存"
+      },
+      {
+        "command": "cursorPositionSaver.restore",
+        "title": "恢复光标位置",
+        "category": "光标保存"
+      },
+      {
+        "command": "cursorPositionSaver.toggleTips",
+        "title": "切换提示模式",
+        "category": "光标保存"
+      },
+      {
+        "command": "cursorPositionSaver.clearAll",
+        "title": "清除所有光标位置",
+        "category": "光标保存"
+      },
+      {
+        "command": "cursorPositionSaver.showStatus",
+        "title": "显示插件状态",
+        "category": "光标保存"
+      }
+    ],
+    "configuration": {
+      "title": "Cursor Position Saver",
+      "properties": {
+        "cursorPositionSaver.enabled": {
+          "type": "boolean",
+          "default": true,
+          "description": "启用光标位置保存功能"
+        },
+        "cursorPositionSaver.saveInterval": {
+          "type": "number",
+          "default": 10,
+          "minimum": 1,
+          "maximum": 300,
+          "description": "自动保存间隔（秒）"
+        },
+        "cursorPositionSaver.maxFilesPerDocument": {
+          "type": "number",
+          "default": 10,
+          "minimum": 1,
+          "maximum": 100,
+          "description": "已弃用：现在每个文件只保存一个光标位置"
+        },
+        "cursorPositionSaver.saveLocation": {
+          "type": "string",
+          "enum": [
+            "c_drive",
+            "d_drive"
+          ],
+          "enumDescriptions": [
+            "保存到C盘用户目录/mycode",
+            "保存到D盘/mycode"
+          ],
+          "default": "c_drive",
+          "description": "光标位置文件保存位置"
+        },
+        "cursorPositionSaver.tipMode": {
+          "type": "string",
+          "enum": [
+            "none",
+            "statusbar",
+            "5s",
+            "10s",
+            "1min"
+          ],
+          "enumDescriptions": [
+            "不显示提示",
+            "仅状态栏显示",
+            "每5秒提示",
+            "每10秒提示",
+            "每1分钟提示"
+          ],
+          "default": "none",
+          "description": "提示显示模式"
+        },
+        "cursorPositionSaver.enableStatusBar": {
+          "type": "boolean",
+          "default": true,
+          "description": "启用状态栏显示"
+        },
+        "cursorPositionSaver.showStartupMessage": {
+          "type": "boolean",
+          "default": true,
+          "description": "显示启动消息"
+        }
+      }
+    },
+    "keybindings": [
+      {
+        "command": "cursorPositionSaver.toggle",
+        "key": "ctrl+alt+c",
+        "mac": "cmd+alt+c",
+        "when": "editorTextFocus"
+      },
+      {
+        "command": "cursorPositionSaver.restore",
+        "key": "ctrl+alt+r",
+        "mac": "cmd+alt+r",
+        "when": "editorTextFocus"
+      }
+    ]
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run compile",
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./",
+    "pretest": "npm run compile && npm run lint",
+    "lint": "eslint src --ext ts",
+    "test": "node ./out/test/runTest.js"
+  },
+  "devDependencies": {
+    "@types/vscode": "^1.60.0",
+    "@types/node": "16.x",
+    "@typescript-eslint/eslint-plugin": "^5.31.0",
+    "@typescript-eslint/parser": "^5.31.0",
+    "eslint": "^8.20.0",
+    "typescript": "^4.7.4"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/your-username/cursor-position-saver.git"
+  },
+  "license": "MIT"
+}
