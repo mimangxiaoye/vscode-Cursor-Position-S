@@ -104,33 +104,19 @@ export class CursorPositionManager {
 
 	private savePositions(): void {
 		try {
-			// 获取当前打开的所有文件路径
-			const openFilePaths = new Set<string>();
-			vscode.window.tabGroups.all.forEach(group => {
-				group.tabs.forEach(tab => {
-					if (tab.input && (tab.input as any).uri) {
-						const uri = (tab.input as any).uri as vscode.Uri;
-						if (uri.scheme === 'file') {
-							openFilePaths.add(uri.fsPath);
-						}
-					}
-				});
-			});
+			// 检查文件大小，如果超过1MB则清理最早的内容
+			let dataStr = JSON.stringify(this.positions, null, 2);
+			let dataSize = Buffer.byteLength(dataStr, 'utf8');
 
-			// 只保留当前打开文件的光标位置
-			const filteredPositions: FilePositions = {};
-			for (const filePath in this.positions) {
-				if (openFilePaths.has(filePath)) {
-					filteredPositions[filePath] = this.positions[filePath];
-				}
+			if (dataSize > 1024 * 1024) { // 1MB
+				this.trimOldestPositions();
+				this.logger.warn('Positions file exceeded 1MB, trimmed oldest entries');
+				dataStr = JSON.stringify(this.positions, null, 2);
+				dataSize = Buffer.byteLength(dataStr, 'utf8');
 			}
-			this.positions = filteredPositions;
-
-			const dataStr = JSON.stringify(this.positions, null, 2);
-			const dataSize = Buffer.byteLength(dataStr, 'utf8');
 
 			fs.writeFileSync(this.storageFile, dataStr);
-			this.logger.debug(`Saved positions to ${this.storageFile} (${dataSize} bytes) for ${Object.keys(this.positions).length} open files`);
+			this.logger.debug(`Saved positions to ${this.storageFile} (${dataSize} bytes) for ${Object.keys(this.positions).length} files`);
 
 			// 更新状态栏显示最后保存时间
 			if (this.statusBarItem) {
@@ -142,6 +128,29 @@ export class CursorPositionManager {
 		}
 	}
 
+	private trimOldestPositions(): void {
+		// 按时间戳排序，删除最早的文件记录
+		const entries = Object.entries(this.positions);
+
+		if (entries.length <= 50) {
+			return; // 如果文件数量不多，不进行清理
+		}
+
+		// 按时间戳从新到旧排序
+		const sortedEntries = entries.sort((a, b) => {
+			return b[1].timestamp - a[1].timestamp;
+		});
+
+		// 只保留最新的一半文件记录
+		const keepCount = Math.floor(entries.length / 2);
+		this.positions = {};
+
+		sortedEntries.slice(0, keepCount).forEach(([filePath, position]) => {
+			this.positions[filePath] = position;
+		});
+
+		this.logger.info(`Trimmed positions: kept ${keepCount} newest files out of ${entries.length} total files`);
+	}
 
 	private setupEventListeners(): void {
 		// 监听光标位置变化
@@ -151,7 +160,7 @@ export class CursorPositionManager {
 			}
 		});
 
-		// 监听文件打开
+		// 监听文件打开 - 恢复光标位置
 		vscode.window.onDidChangeActiveTextEditor((editor) => {
 			if (editor && this.isEnabled()) {
 				this.restoreCursorPosition(editor);
@@ -354,12 +363,39 @@ export class CursorPositionManager {
 		const saveInterval = config.get<number>('saveInterval', 10);
 		const tipMode = config.get<string>('tipMode', 'none');
 		const saveLocation = config.get<string>('saveLocation', 'c_drive');
-		const fileCount = Object.keys(this.positions).length;
+		const totalFiles = Object.keys(this.positions).length;
+
+		// 获取当前打开的文件数量
+		const openFilePaths = new Set<string>();
+		vscode.window.tabGroups.all.forEach(group => {
+			group.tabs.forEach(tab => {
+				if (tab.input && (tab.input as any).uri) {
+					const uri = (tab.input as any).uri as vscode.Uri;
+					if (uri.scheme === 'file') {
+						openFilePaths.add(uri.fsPath);
+					}
+				}
+			});
+		});
+
+		const openFiles = Array.from(openFilePaths).filter(path => this.positions[path]).length;
+
+		// 计算文件大小
+		let fileSize = '0 KB';
+		try {
+			if (fs.existsSync(this.storageFile)) {
+				const stats = fs.statSync(this.storageFile);
+				const sizeInKB = Math.round(stats.size / 1024);
+				fileSize = sizeInKB >= 1024 ? `${Math.round(sizeInKB / 1024 * 10) / 10} MB` : `${sizeInKB} KB`;
+			}
+		} catch (error) {
+			this.logger.error('Failed to get file size', error);
+		}
 
 		// 转换保存位置显示文本
 		const locationText = saveLocation === 'c_drive' ? 'C盘用户目录/mycode' : 'D盘/mycode';
 
-		const message = `状态: ${enabled ? '启用' : '禁用'} | 保存间隔: ${saveInterval}秒 | 已保存文件数: ${fileCount} | 提示模式: ${tipMode} | 保存位置: ${locationText}`;
+		const message = `状态: ${enabled ? '启用' : '禁用'} | 保存间隔: ${saveInterval}秒 | 总文件数: ${totalFiles} | 当前打开: ${openFiles} | 文件大小: ${fileSize} | 提示模式: ${tipMode} | 保存位置: ${locationText}`;
 		vscode.window.showInformationMessage(`插件状态: ${message}`);
 		this.logger.info(`Status: ${message}`);
 	}
